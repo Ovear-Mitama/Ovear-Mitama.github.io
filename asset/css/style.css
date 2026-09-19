@@ -1,6 +1,6 @@
 /* ============================================================
-   Damage Engine API 文档样式
-   由 api.html 通过 <link rel="stylesheet" href="asset/css/style.css"> 引入
+   Anima｜赋灵 文档站样式
+   由各页面通过 <link rel="stylesheet" href="asset/css/style.css"> 引入
    ============================================================ */
 
 /* 本地字体图标(Font Awesome 6 Free Solid)
@@ -64,8 +64,13 @@ html[data-theme="dark"] {
   --scrollbar-thumb-hover: #55555e;
 }
 
-/* ---------- 自定义滚动条 ---------- */
-* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+/* ---------- 自定义滚动条 ----------
+   规则给「页面本身」和「左侧目录列表」用的是同一套值,因此两边观感完全一致。
+   注意:Chromium 只要看到 scrollbar-color 就会忽略 ::-webkit-scrollbar,
+   所以标准属性只在没有 WebKit 伪元素的浏览器(Firefox)里启用。 */
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+}
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -80,6 +85,9 @@ html[data-theme="dark"] {
   background-clip: content-box;
 }
 ::-webkit-scrollbar-corner { background: transparent; }
+
+/* 左侧目录列表没有单独的滚动条规则:它和正文共用上面这一套,
+   Chromium 下会一起走 ::-webkit-scrollbar 的自定义样式。 */
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -129,9 +137,12 @@ header.topbar {
   image-rendering: pixelated;
 }
 
+/* 模组图标(app.js 按当前模组换上去):细节多,平滑缩放 */
+.brand .logo.logo-mod { image-rendering: auto; }
+
 .topbar .spacer { flex: 1; }
 
-/* 顶栏操作区:主题切换 + 语言下拉 */
+/* 顶栏操作区:主题切换 */
 .top-actions { display: flex; align-items: center; gap: 8px; }
 
 .icon-btn {
@@ -149,6 +160,64 @@ header.topbar {
 }
 .icon-btn:hover { color: var(--text); }
 
+/* ---------- 顶栏:文档切换下拉(标题右侧) ---------- */
+.doc-select { position: relative; }
+
+.doc-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-family: inherit;
+}
+.doc-current:hover { border-color: var(--sidebar-hover); color: var(--sidebar-hover); }
+.doc-current .chev {
+  font-size: 10px;
+  opacity: .7;
+  transition: transform .15s ease;
+}
+.doc-select.open .doc-current .chev { transform: rotate(180deg); }
+
+.doc-menu {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  min-width: 236px;
+  padding: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .14);
+  display: none;
+  z-index: 40;
+}
+.doc-select.open .doc-menu { display: block; }
+
+.doc-option {
+  display: block;
+  padding: 7px 10px;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.doc-option:hover { background: var(--bg-soft); color: var(--sidebar-hover); }
+.doc-option.active { color: var(--sidebar-hover); font-weight: 600; }
+.doc-option .doc-hint {
+  display: block;
+  margin-top: 1px;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-soft);
+}
+
+/* ---------- 顶栏:语言切换下拉(右上角) ---------- */
 .lang-select { position: relative; }
 
 .lang-current {
@@ -164,6 +233,7 @@ header.topbar {
   font-size: 12.5px;
   font-family: inherit;
 }
+.lang-current:hover { border-color: var(--sidebar-hover); color: var(--sidebar-hover); }
 .lang-current .chev {
   font-size: 10px;
   opacity: .7;
@@ -200,7 +270,7 @@ header.topbar {
   font-family: inherit;
 }
 .lang-option:hover { background: var(--bg-soft); }
-.lang-option.active { color: var(--accent); font-weight: 600; }
+.lang-option.active { color: var(--sidebar-hover); font-weight: 600; }
 
 .menu-btn {
   display: none;
@@ -220,6 +290,30 @@ header.topbar {
   align-items: start;
   width: 100%;
 }
+/* 落地页没有侧栏(app.js 加的标记) */
+.layout.no-side { grid-template-columns: minmax(0, 1fr); }
+.layout.no-side nav.sidebar { display: none; }
+
+/* ---------- 落地页:模组卡片 ---------- */
+.mod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 18px 0 8px;
+}
+.mod-card {
+  display: block;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  color: var(--text);
+  text-decoration: none;
+}
+.mod-card:hover { border-color: var(--sidebar-hover); }
+.mod-card .mod-name { font-size: 17px; font-weight: 700; }
+.mod-card .mod-tag { display: inline-block; margin-top: 6px; font-size: 13px; color: var(--text-soft); }
+.mod-card .mod-desc { margin: 8px 0 0; font-size: 14px; color: var(--text-soft); }
 
 nav.sidebar {
   position: sticky;

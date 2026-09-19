@@ -1,20 +1,44 @@
 /* ============================================================
-   Damage Engine API 文档 - 页面逻辑
-   依赖:asset/js/i18n.js(window.DE_I18N / window.DE_LANGS)
-         asset/js/nav.js (window.DE_NAV)
+   文档站 - 页面逻辑
+   依赖: asset/js/nav.js  (window.ANIMA_DOCS)
+         asset/js/i18n.js (window.SITE_LANGS / window.SITE_I18N)
+   负责: 顶部「切换模组」下拉、右上角语言切换、侧栏渲染、分类折叠、
+         滚动高亮、深浅色主题、代码复制、移动端目录抽屉
    ============================================================ */
 (function () {
   'use strict';
 
-  var I18N = window.DE_I18N || { zh: {}, en: {} };
-  var LANGS = window.DE_LANGS || [{ code: 'zh', label: '简体中文' }];
-  var NAV = window.DE_NAV || [];
+  var DOCS = window.ANIMA_DOCS || { siteTitle: '文档', mods: [], nav: {} };
+  var MODS = DOCS.mods || [];
+  var NAV = DOCS.nav || {};
+  var I18N = window.SITE_I18N || { zh: {} };
+  var LANGS = window.SITE_LANGS || [{ code: 'zh', label: '简体中文' }];
 
-  var LANG_KEY = 'de-doc-lang';
-  var THEME_KEY = 'de-doc-theme';
+  var THEME_KEY = 'anima-doc-theme';
+  var LANG_KEY = 'anima-doc-lang';
 
-  var currentLang = 'zh';
   var currentTheme = 'light';
+  var currentLang = 'zh';
+
+  /* ---------- 当前是哪个模组 / 哪一个页面 ---------- */
+  function pathName() {
+    return decodeURIComponent(location.pathname);
+  }
+
+  function currentMod() {
+    var path = pathName();
+    for (var i = 0; i < MODS.length; i++) {
+      if (path.indexOf('/' + MODS[i].id + '/') !== -1) return MODS[i];
+    }
+    return null;
+  }
+
+  function currentPageKey() {
+    var file = pathName().split('/').pop();
+    if (!file) file = 'index.html';
+    var mod = currentMod();
+    return mod ? (mod.id + '/' + file) : file;
+  }
 
   /* ---------- 本地存储(隐私模式下静默失败) ---------- */
   function store(key, value) {
@@ -24,36 +48,92 @@
     try { return localStorage.getItem(key); } catch (e) { return null; }
   }
 
-  /* ---------- 侧栏:按 nav.js 配置渲染 ---------- */
+  /* ---------- 顶栏:站点标题 + 模组切换下拉(标题右侧) ---------- */
+  function initTopbar() {
+    var select = document.getElementById('docSelect');
+    var btn = document.getElementById('docBtn');
+    var menu = document.getElementById('docMenu');
+    var label = document.getElementById('docLabel');
+    if (!select || !btn || !menu) return;
+
+    var here = currentMod();
+    applyBrandIcon(here);
+
+    MODS.forEach(function (mod) {
+      var opt = document.createElement('a');
+      opt.className = 'doc-option' + (here && here.id === mod.id ? ' active' : '');
+      opt.href = mod.home;
+      opt.textContent = mod.label;
+      if (mod.hint) {
+        var hint = document.createElement('span');
+        hint.className = 'doc-hint';
+        hint.textContent = mod.hint;
+        opt.appendChild(hint);
+      }
+      menu.appendChild(opt);
+    });
+
+    if (label) label.textContent = here ? here.label : '切换模组';
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      select.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { select.classList.remove('open'); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') select.classList.remove('open');
+    });
+  }
+
+  /* ---------- 顶栏图标:模组页面显示该模组自己的图标(落地页保持站点图标) ---------- */
+  function applyBrandIcon(mod) {
+    var logo = document.querySelector('.brand .logo');
+    if (!logo || !mod || !mod.icon) return;
+    logo.src = mod.icon;
+    logo.alt = mod.label || '';
+    /* 模组图标细节多,用平滑缩放而不是 style.css 里给站点图标定的像素化 */
+    logo.classList.add('logo-mod');
+  }
+
+  /* ---------- 侧栏:按 nav.js 里当前页的配置渲染 ---------- */
   function renderNav() {
     var nav = document.getElementById('sidebar');
-    if (!nav || !NAV.length) return;
+    if (!nav) return;
 
-    NAV.forEach(function (group, index) {
+    var groups = NAV[currentPageKey()] || [];
+    /* 落地页没有侧栏:让正文占满整行 */
+    if (!groups.length) {
+      var layout = document.querySelector('.layout');
+      if (layout) layout.classList.add('no-side');
+      return;
+    }
+
+    groups.forEach(function (group, index) {
       var section = document.createElement('div');
-      /* 第一个分类(入门)默认展开,其余默认收起 */
+      /* 第一个分类默认展开,其余默认收起 */
       section.className = 'nav-section' + (index > 0 ? ' collapsed' : '');
 
-      var btn = document.createElement('button');
-      btn.className = 'nav-group-btn';
-      btn.type = 'button';
+      var head = document.createElement('button');
+      head.className = 'nav-group-btn';
+      head.type = 'button';
 
       var title = document.createElement('span');
-      title.setAttribute('data-i18n', group.key);
-
+      title.textContent = group.group;
+      if (group.key) title.setAttribute('data-i18n', group.key);
       var chev = document.createElement('i');
       chev.className = 'fa-solid fa-chevron-right chev';
 
-      btn.appendChild(title);
-      btn.appendChild(chev);
-      section.appendChild(btn);
+      head.appendChild(title);
+      head.appendChild(chev);
+      section.appendChild(head);
 
       var items = document.createElement('div');
       items.className = 'nav-items';
       (group.items || []).forEach(function (item) {
         var a = document.createElement('a');
         a.setAttribute('href', item.href);
-        a.setAttribute('data-i18n', item.key);
+        a.textContent = item.label;
+        if (item.key) a.setAttribute('data-i18n', item.key);
         items.appendChild(a);
       });
       section.appendChild(items);
@@ -70,17 +150,40 @@
     return null;
   }
 
+  /** 记下每个带 data-i18n 的元素最初的文字(页面里写的中文),切换语言时用它兜底。 */
+  function snapshotOriginal() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      if (el.getAttribute('data-i18n-orig') == null) {
+        el.setAttribute('data-i18n-orig', el.innerHTML);
+      }
+    });
+  }
+
   function applyLang(lang) {
     var dict = I18N[lang] || I18N.zh || {};
     currentLang = lang;
+    document.documentElement.lang = (lang === 'zh') ? 'zh-CN' : (lang === 'zhTW' ? 'zh-Hant' : 'en');
 
-    var htmlLang = (lang === 'zh') ? 'zh-CN' : (lang === 'zhTW' ? 'zh-Hant' : 'en');
-    document.documentElement.lang = htmlLang;
-    document.title = dict['brand.title'] || 'Damage Engine API';
-
+    /* data-i18n 标记的元素:没有对应词条时回到页面原本的文字(中文回退) */
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       var key = el.getAttribute('data-i18n');
-      if (dict[key] != null) el.innerHTML = dict[key];
+      var orig = el.getAttribute('data-i18n-orig');
+      if (dict[key] != null) {
+        el.innerHTML = dict[key];
+      } else if (orig != null) {
+        el.innerHTML = orig;
+      }
+    });
+
+    /* 没有 data-i18n 的几处固定文案 */
+    var brand = document.getElementById('brandName');
+    if (brand) brand.textContent = dict['site.title'] || DOCS.siteTitle || '文档';
+    if (!currentMod()) {
+      var dl = document.getElementById('docLabel');
+      if (dl) dl.textContent = dict['doc.switch'] || '切换模组';
+    }
+    document.querySelectorAll('.copy-btn').forEach(function (b) {
+      b.textContent = dict['btn.copy'] || '复制';
     });
 
     var label = document.getElementById('langLabel');
@@ -98,37 +201,47 @@
     var select = document.getElementById('langSelect');
     var btn = document.getElementById('langBtn');
     var menu = document.getElementById('langMenu');
+    if (!select || !btn || !menu) return;
 
-    if (menu) {
-      LANGS.forEach(function (lang) {
-        var opt = document.createElement('button');
-        opt.className = 'lang-option';
-        opt.type = 'button';
-        opt.textContent = lang.label;
-        opt.setAttribute('data-lang', lang.code);
-        opt.addEventListener('click', function () {
-          applyLang(lang.code);
-          if (select) select.classList.remove('open');
-        });
-        menu.appendChild(opt);
-      });
-    }
-
-    if (select && btn) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        select.classList.toggle('open');
-      });
-      document.addEventListener('click', function () {
+    LANGS.forEach(function (lang) {
+      var opt = document.createElement('button');
+      opt.className = 'lang-option';
+      opt.type = 'button';
+      opt.textContent = lang.label;
+      opt.setAttribute('data-lang', lang.code);
+      opt.addEventListener('click', function () {
+        applyLang(lang.code);
         select.classList.remove('open');
       });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') select.classList.remove('open');
-      });
-    }
+      menu.appendChild(opt);
+    });
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      select.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { select.classList.remove('open'); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') select.classList.remove('open');
+    });
 
     var saved = read(LANG_KEY);
     applyLang(langMeta(saved) ? saved : 'zh');
+  }
+
+  /* ---------- 移动端那个「目录」按钮:图标保留,文字可翻译 ---------- */
+  function initMenuButton() {
+    var mb = document.getElementById('menuBtn');
+    if (!mb) return;
+    mb.textContent = '';
+    var icon = document.createElement('i');
+    icon.className = 'fa-solid fa-bars';
+    var text = document.createElement('span');
+    text.setAttribute('data-i18n', 'btn.menu');
+    text.textContent = '目录';
+    mb.appendChild(icon);
+    mb.appendChild(document.createTextNode(' '));
+    mb.appendChild(text);
   }
 
   /* ---------- 深色 / 浅色主题 ---------- */
@@ -137,13 +250,10 @@
     document.documentElement.setAttribute('data-theme', theme);
 
     var icon = document.querySelector('#themeBtn i');
-    if (icon) {
-      icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-    }
+    if (icon) icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+
     var btn = document.getElementById('themeBtn');
-    if (btn) {
-      btn.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-    }
+    if (btn) btn.setAttribute('aria-label', theme === 'dark' ? '切换到浅色' : '切换到深色');
   }
 
   function initTheme() {
@@ -171,10 +281,8 @@
 
         navigator.clipboard.writeText(pre.innerText).then(function () {
           var dict = I18N[currentLang] || I18N.zh || {};
-          btn.textContent = dict['btn.copied'] || 'Copied';
-          setTimeout(function () {
-            btn.textContent = dict['btn.copy'] || 'Copy';
-          }, 1200);
+          btn.textContent = dict['btn.copied'] || '已复制';
+          setTimeout(function () { btn.textContent = dict['btn.copy'] || '复制'; }, 1200);
         });
       });
     });
@@ -225,7 +333,8 @@
       if (backdrop) backdrop.classList.remove('show');
     }
 
-    menuBtn.addEventListener('click', function () {
+    menuBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
       sidebar.classList.toggle('open');
       if (backdrop) backdrop.classList.toggle('show', sidebar.classList.contains('open'));
     });
@@ -238,9 +347,12 @@
 
   /* ---------- 初始化 ---------- */
   initTheme();
+  initTopbar();
   renderNav();
-  initLangSelect();
+  initMenuButton();
   initCopyButtons();
+  snapshotOriginal();  // 必须在 renderNav 之后:侧栏是脚本生成的
+  initLangSelect();
   initCollapse();
   initScrollSpy();
   initDrawer();
