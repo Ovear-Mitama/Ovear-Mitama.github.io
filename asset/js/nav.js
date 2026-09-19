@@ -11,10 +11,10 @@
 window.ANIMA_DOCS = {
   siteTitle: '模组文档',
 
-  /* icon: 顶栏左上角那个图标;路径相对"本模组目录"(和它的页面放在一起) */
+  /* home / icon 都相对站点根写(app.js 会按当前页面的层级补上 ../) */
   mods: [
-    { id: 'anima', label: 'Anima｜赋灵', home: 'anima/index.html', hint: '动画库 · 动画工作台', icon: 'icon.png' },
-    { id: 'damage-engine', label: 'Damage Engine', home: 'damage-engine/index.html', hint: '战斗评分 · 扩展 API', icon: 'icon.png' }
+    { id: 'anima', label: 'Anima｜赋灵', home: 'anima/index.html', hint: '动画库 · 动画工作台', icon: 'anima/icon.png' },
+    { id: 'damage-engine', label: 'Damage Engine', home: 'damage-engine/index.html', hint: '战斗评分 · 扩展 API', icon: 'damage-engine/icon.png' }
   ],
 
   nav: {

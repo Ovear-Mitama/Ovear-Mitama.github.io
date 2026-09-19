@@ -40,6 +40,18 @@
     return mod ? (mod.id + '/' + file) : file;
   }
 
+  /* mods 里的 home / icon 都是相对站点根写的(如 anima/index.html),而页面可能在下一层
+     (/anima/api.html)。这里算出回到站点根要补的前缀,否则在模组页点另一个模组会拼成
+     /anima/damage-engine/index.html 而 404。 */
+  function rootBase() {
+    var segs = pathName().split('/').filter(function (p) { return p !== ''; });
+    /* 末段是文件名(带扩展名)就去掉,剩下的目录层数就是要补的 ../ 个数 */
+    if (segs.length && /\.[a-z0-9]+$/i.test(segs[segs.length - 1])) segs.pop();
+    var out = '';
+    for (var i = 0; i < segs.length; i++) out += '../';
+    return out;
+  }
+
   /* ---------- 本地存储(隐私模式下静默失败) ---------- */
   function store(key, value) {
     try { localStorage.setItem(key, value); } catch (e) {}
@@ -62,7 +74,7 @@
     MODS.forEach(function (mod) {
       var opt = document.createElement('a');
       opt.className = 'doc-option' + (here && here.id === mod.id ? ' active' : '');
-      opt.href = mod.home;
+      opt.href = rootBase() + mod.home;
       opt.textContent = mod.label;
       if (mod.hint) {
         var hint = document.createElement('span');
@@ -89,7 +101,7 @@
   function applyBrandIcon(mod) {
     var logo = document.querySelector('.brand .logo');
     if (!logo || !mod || !mod.icon) return;
-    logo.src = mod.icon;
+    logo.src = rootBase() + mod.icon;
     logo.alt = mod.label || '';
     /* 模组图标细节多,用平滑缩放而不是 style.css 里给站点图标定的像素化 */
     logo.classList.add('logo-mod');
