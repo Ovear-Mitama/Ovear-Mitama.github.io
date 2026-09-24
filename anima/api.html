@@ -70,8 +70,9 @@
         <tr><td rowspan="2">文本动画</td><td><code class="inline">drawHudText(...)</code></td><td>HUD 上带独立时钟的动画文本</td></tr>
         <tr><td><code class="inline">textSpec(tag)</code> / <code class="inline">specOf(...)</code> / <code class="inline">registerTextTag(...)</code></td><td>取 / 拼 / 注册动画规格</td></tr>
 
-        <tr><td rowspan="2">粒子</td><td><code class="inline">emitParticles(...)</code></td><td>按注册表 id 发射真实 3D 粒子</td></tr>
+        <tr><td rowspan="3">粒子</td><td><code class="inline">emitParticles(...)</code></td><td>按注册表 id 发射真实 3D 粒子</td></tr>
         <tr><td><code class="inline">isParticleSupported(id)</code></td><td>该粒子能否被发射</td></tr>
+        <tr><td><code class="inline">particleClips(clipsJson)</code></td><td>把编辑器导出的粒子剪辑（<code class="inline">particle_3d</code> / <code class="inline">particle_group</code>）解析成播放模板：每个动画实例 <code class="inline">newPlayer()</code> 后按自己的时钟 <code class="inline">emit(...)</code>，粒子剪辑才会在实际使用中发射</td></tr>
 
         <tr><td rowspan="3">特效 / 动画</td><td><code class="inline">registerEffect(...)</code></td><td>注册特效工厂或固定实例</td></tr>
         <tr><td><code class="inline">registerInterpolator(...)</code></td><td>注册缓动曲线</td></tr>
@@ -188,8 +189,20 @@ AnimaApi.emitParticles("minecraft:flame", x, y, z, 20, 0.2, 0.2, 0.2, 0.05);
 // 发射前可以先问一句能不能用(dust / block 这类参数化粒子返回 false)
 if (AnimaApi.isParticleSupported("minecraft:flame")) {
     // ...
-}</code></pre>
+}
+
+// 编辑器导出的粒子剪辑:解析一次拿到模板,每个动画实例(一次跳字 / 一个预览对象)各自
+// newPlayer(),再用实例自己的毫秒时钟 emit —— 否则这些粒子只在编辑器预览里出现
+ClipParticles clips = AnimaApi.particleClips(exportedClipsJson);
+ClipParticles.Player particles = clips.newPlayer();
+particles.emit(objectX, objectY, objectZ, localMs); // 每帧调用;时钟回退会自动重放</code></pre>
     <p>粒子按<strong>注册表 id</strong>发射，原版和别的 mod 注册的粒子都能用。</p>
+    <p>
+      粒子剪辑（编辑器里拖进来的「自定义粒子 / 粒子组」）的数量是<strong>整条剪辑的总量</strong>，
+      在剪辑窗口内按进度陆续发出；发射点是对象位置 + 剪辑自身的偏移 <code class="inline">ox/oy/oz</code>，
+      之后交给原版粒子引擎模拟，不跟随文本移动。把这份剪辑 JSON 交给
+      <code class="inline">particleClips(...)</code> 就能在实际使用中复现编辑器里看到的效果。
+    </p>
 
     <h2 id="sprite">贴图拼字<a class="anchor" href="#sprite">#</a></h2>
     <p>把一张图按固定格子切开当字形（<code class="inline">charset</code> 的第 i 个字符用第 i 格），用来做「纹理数字」：</p>

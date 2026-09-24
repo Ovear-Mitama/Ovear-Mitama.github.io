@@ -89,7 +89,9 @@
       <strong>世界里的坐标轴：</strong>选中物体后，它的位置处会出现一根三色坐标轴 —— 它就是本库的<strong>移动轴</strong>，<strong>拖轴</strong>就能沿该轴移动。
       位置仍由世界坐标投影决定，但线条画在<strong>2D 屏幕层</strong>、朝向固定（不随视角转动）。
       正对相机的那根轴会收缩隐藏（和 Blender / Unity 一样），避免出现没有意义的「斜线」。
-      它只在<strong>世界的浮窗预览</strong>里可用，也就是要先进入 <code class="inline">anima-config</code> 专用世界再按「打开动画编辑器」按键打开浮窗。
+      它只在<strong>世界的浮窗预览</strong>里可用，也就是要先进入 <code class="inline">anima-config</code> 专用世界再按「打开动画编辑器」按键打开浮窗。<br>
+      <strong>坐标轴跟着选中的对象走：</strong>选文本对象时，拖轴改的是（带关键帧的）文本位置；选中单个粒子 / 粒子组时，坐标轴会贴到那个粒子的发射点上，拖轴改的是它自己的偏移
+      <code class="inline">ox/oy/oz</code>，<strong>不会把示例文字一起带走</strong>。开关在属性面板最下方（「显示坐标系：开 / 关」），文本对象和粒子都有。
     </div>
 
     <h2 id="palette">效果/粒子 调色板<a class="anchor" href="#palette">#</a></h2>
@@ -144,6 +146,12 @@
     </table>
     <div class="callout note">
       <strong>输入框：</strong>都是「下划线」风格，直接点进去改数值即可；改完的值会写进这条动画的参数里。
+      点面板之外的任何地方（时间线 / 空白 / 世界）会自动退出输入状态，此时 WASD、空格、Delete 恢复成快捷键。
+    </div>
+    <div class="callout note">
+      <strong>动画条的名称会保存：</strong>改过的名称和剪辑一起导出，重新打开编辑器不会重置回预设名。<br>
+      <strong>位移类逐字动画的「动画时长」</strong>（下落 / 随机下落 / 飘入）同时决定两件事：逐字出现的间隔，以及每个字运动多久 ——
+      时长调大，字出现得更疏、飘落 / 下落更慢；调小则更紧凑。
     </div>
 
     <h2 id="keys">文本关键帧<a class="anchor" href="#keys">#</a></h2>
