@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>快速开始 · Anima｜赋灵</title>
+<title>快速开始 · Anima</title>
 <link rel="stylesheet" href="../asset/font/css/fontawesome.min.css">
 <link rel="stylesheet" href="../asset/css/style.css">
 </head>
@@ -41,7 +41,7 @@
 
   <main id="top">
     <section class="hero">
-      <h1>Anima｜赋灵</h1>
+      <h1>Anima</h1>
       <p class="lead" data-i18n="home.lead">
         Minecraft <strong>1.21.1</strong> 的客户端动画库 / 动画工作台。给 GUI 贴图、世界内精灵、文本加关键帧动画，
         并在游戏里用一条<strong>剪映式多轨时间线</strong>把它们编成完整的演出。
@@ -63,7 +63,7 @@
       <thead><tr><th>能力</th><th>说明</th></tr></thead>
       <tbody>
         <tr><td>资源包 JSON 动画</td><td>四种类型：<code class="inline">gui_sprite</code> / <code class="inline">gui_dynamic</code> / <code class="inline">world_sprite</code> / <code class="inline">text</code>，配 6 种内置特效与 30+ 缓动曲线。见 <a href="json.html">资源包 JSON 动画</a>。</td></tr>
-        <tr><td>游戏内可视化编辑器</td><td>左侧拖特效、中间实时预览、右侧调属性、底部多轨时间线；<code class="inline">F7</code> 打开。见 <a href="editor.html">编辑器使用教程</a>。</td></tr>
+        <tr><td>游戏内可视化编辑器</td><td>左侧拖特效、中间实时预览、右侧调属性、底部多轨时间线；按「打开动画编辑器」按键打开（<strong>默认未指定</strong>）。见 <a href="editor.html">编辑器使用教程</a>。</td></tr>
         <tr><td>逐字动画</td><td>打字入场 / 出场、下落、随机下落、飘入——每个字有独立的位移、缩放、旋转、透明度。</td></tr>
         <tr><td>真 3D 世界文字</td><td>真实透视、会被方块遮挡、可开关距离缩放；也能投影到 HUD 层保持像素大小。</td></tr>
         <tr><td>粒子</td><td>按注册表 id 发射原版 / 其它 mod 的粒子，支持 <code class="inline">/particle</code> 语义的数量与散布；可在编辑器里把多个粒子组编成「粒子组」并导出分享。</td></tr>
@@ -116,19 +116,20 @@ cd neoforge &amp;&amp; ./gradlew runClient</code></pre>
     <table data-i18n="home.open.body">
       <thead><tr><th>方式</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td><kbd>F7</kbd>（可改键）</td><td>已经在世界里 → 直接开成浮窗；不在世界里 → 先带你进入<strong>配置世界</strong>，进去后按 <kbd>F7</kbd> 开关浮窗。</td></tr>
-        <tr><td>Mod Menu</td><td>模组列表 → 「Anima｜赋灵」→ 配置按钮。</td></tr>
+        <tr><td>「打开动画编辑器」按键</td><td><strong>默认未指定</strong>，需在「选项 → 按键控制 → 杂项」里自行绑定。已经在世界里 → 直接开成浮窗；不在世界里 → 先带你进入<strong>配置世界</strong>，进去后按「打开动画编辑器」按键开关浮窗。</td></tr>
+        <tr><td>「播放 / 暂停（编辑器）」按键</td><td><strong>默认未指定</strong>，编辑器获得焦点时按空格效果相同。</td></tr>
+        <tr><td>Mod Menu</td><td>模组列表 → 「Anima」→ 配置按钮。</td></tr>
         <tr><td>代码调用</td><td><code class="inline">AnimaApi.openTimelineEditor(parent)</code> / <code class="inline">AnimaApi.openAnimationEditor(parent)</code></td></tr>
       </tbody>
     </table>
 
     <h2 id="first"><span data-i18n="nv.first">第一条动画</span><a class="anchor" href="#first">#</a></h2>
     <ol data-i18n="home.first.body">
-      <li>按 <kbd>F7</kbd> 进入编辑器（不在世界里时会先创建并进入 <code class="inline">anima-config</code> 配置世界）。</li>
+      <li>按「打开动画编辑器」按键进入编辑器（不在世界里时会先创建并进入 <code class="inline">anima-config</code> 配置世界）。</li>
       <li>从左上的「效果/粒子」里把 <strong>淡入</strong> 拖到下方时间线上。</li>
       <li>再拖一个 <strong>打字入场</strong>，它会自动锁在时间线开头（入场类动画固定贴左边）。</li>
       <li>点时间线空白处拖动播放头，中间的预览会实时跟着变。</li>
-      <li>要粒子就拖「+ 自定义粒子」，再在右侧属性面板里填数量 / 散布 / 速度。</li>
+      <li>要粒子就拖「+ 自定义粒子」，再在右侧属性面板里填数量 / 散布 / 速度（粒子预览是世界里真实发射的 3D 粒子，需要进入 <code class="inline">anima-config</code> 世界才能看到）。</li>
       <li>选中时间线上的条，按 <kbd>Delete</kbd> 删除；右键有复制 / 创建组 / 删除菜单。</li>
     </ol>
 
@@ -141,7 +142,7 @@ cd neoforge &amp;&amp; ./gradlew runClient</code></pre>
     </ul>
 
     <footer class="foot">
-      <span>Anima｜赋灵 · Minecraft 1.21.1 · Fabric / NeoForge · Apache-2.0</span>
+      <span>Anima · Minecraft 1.21.1 · Fabric / NeoForge · Apache-2.0</span>
     </footer>
   </main>
 </div>

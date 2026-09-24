@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>兼容性与 FAQ · Anima｜赋灵</title>
+<title>兼容性与 FAQ · Anima</title>
 <link rel="stylesheet" href="../asset/font/css/fontawesome.min.css">
 <link rel="stylesheet" href="../asset/css/style.css">
 </head>
@@ -84,22 +84,31 @@
 
     <h2 id="faq">常见问题<a class="anchor" href="#faq">#</a></h2>
 
-    <h3>按 F7 没反应 / 直接进了另一个世界？</h3>
+    <h3>按了按键没反应 / 直接进了另一个世界？</h3>
     <p>
-      这是因为编辑器需要真实世界渲染：如果你在主菜单（不在存档里），Anima 会先把 <code class="inline">anima-config</code> 配置世界建好并把你带进去，
-      进去之后再按一次 <kbd>F7</kbd> 就会弹出编辑浮窗。这个沙盒世界与你的存档互不影响。
+      「打开动画编辑器」按键<strong>默认未指定</strong>，需要先在「选项 → 按键控制 → 杂项」里自行绑定。
+      另外，编辑器需要真实世界渲染：如果你在主菜单（不在存档里），Anima 会先把 <code class="inline">anima-config</code> 配置世界建好并把你带进去，
+      进去之后再按一次「打开动画编辑器」按键就会弹出编辑浮窗。这个沙盒世界与你的存档互不影响。
     </p>
 
     <h3>编辑器里没有字，只有坐标轴？</h3>
     <ul>
-      <li>确认在世界里（浮窗模式），中间区域在完整界面模式下才会画预览画布；</li>
+      <li>确认在<strong>世界的浮窗预览</strong>里：需要先进入 <code class="inline">anima-config</code> 专用世界，再按「打开动画编辑器」按键打开浮窗，中间区域才会渲染真实世界里发出来的 3D 文字；</li>
       <li>检查属性面板里<strong>透明度</strong>是不是被调到了 0；</li>
       <li>视角可能正对着文字的背面 —— 用 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 或右键拖动绕一圈看看。</li>
     </ul>
 
     <h3>坐标轴拖不动 / 某根轴不见了？</h3>
     <p>
-      正对相机的那根轴会收缩并隐藏（避免出现方向没有意义的斜线），转一下视角它就会回来。另外坐标轴只在世界的浮窗预览里可用。
+      它就是本库的移动轴：位置由世界坐标投影决定，但线条画在<strong>2D 屏幕层</strong>、朝向固定（不随视角转动）。
+      正对相机的那根轴会收缩并隐藏（避免出现方向没有意义的斜线），转一下视角它就会回来。
+      另外坐标轴只在<strong>世界的浮窗预览</strong>里可用，也就是要先进入 <code class="inline">anima-config</code> 专用世界。
+    </p>
+
+    <h3>为什么在没进世界时看不到粒子预览？</h3>
+    <p>
+      粒子预览只有一条路径：世界里<strong>真实发射的 3D 粒子</strong>（没有 2D 精灵模板那套替身）。
+      因此它只在 <code class="inline">anima-config</code> 专用世界的浮窗预览里发射；不在世界里时自然看不到。
     </p>
 
     <h3>改了属性，时间线长度也跟着变了？</h3>
@@ -143,7 +152,7 @@
     </ul>
 
     <footer class="foot">
-      <span>Anima｜赋灵 · Minecraft 1.21.1 · Fabric / NeoForge · Apache-2.0</span>
+      <span>Anima · Minecraft 1.21.1 · Fabric / NeoForge · Apache-2.0</span>
     </footer>
   </main>
 </div>

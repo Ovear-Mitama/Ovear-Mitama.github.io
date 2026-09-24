@@ -13,12 +13,12 @@ window.ANIMA_DOCS = {
 
   /* home / icon 都相对站点根写(app.js 会按当前页面的层级补上 ../) */
   mods: [
-    { id: 'anima', label: 'Anima｜赋灵', home: 'anima/index.html', hint: '动画库 · 动画工作台', icon: 'anima/icon.png' },
+    { id: 'anima', label: 'Anima', home: 'anima/index.html', hint: '动画库 · 动画工作台', icon: 'anima/icon.png' },
     { id: 'damage-engine', label: 'Damage Engine', home: 'damage-engine/index.html', hint: '战斗评分 · 扩展 API', icon: 'damage-engine/icon.png' }
   ],
 
   nav: {
-    /* ---------- Anima｜赋灵 ---------- */
+    /* ---------- Anima ---------- */
     'anima/index.html': [
       {
         group: '文档',

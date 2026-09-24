@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>编辑器使用教程 · Anima｜赋灵</title>
+<title>编辑器使用教程 · Anima</title>
 <link rel="stylesheet" href="../asset/font/css/fontawesome.min.css">
 <link rel="stylesheet" href="../asset/css/style.css">
 </head>
@@ -52,8 +52,8 @@
     <table>
       <thead><tr><th>方式</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td><kbd>F7</kbd></td><td>默认快捷键（可在「按键设置」里改）。世界里直接开成<strong>浮窗</strong>，世界继续渲染，边看边调。</td></tr>
-        <tr><td>Mod Menu</td><td>模组列表 → 「Anima｜赋灵」→ 配置按钮，打开<strong>编排编辑器</strong>（Mod Menu 是可选的）。</td></tr>
+        <tr><td>「打开动画编辑器」按键</td><td><strong>默认未指定</strong>，需在「选项 → 按键控制 → 杂项」里自行绑定。世界里直接开成<strong>浮窗</strong>，世界继续渲染，边看边调。</td></tr>
+        <tr><td>Mod Menu</td><td>模组列表 → 「Anima」→ 配置按钮，打开<strong>编排编辑器</strong>（Mod Menu 是可选的）。</td></tr>
         <tr><td>代码</td><td><code class="inline">AnimaApi.openTimelineEditor(parent)</code>（编排编辑器）或 <code class="inline">openClipEditor(parent, clips, onSave)</code>（剪辑编辑器，结果在关闭时回传）。</td></tr>
       </tbody>
     </table>
@@ -66,7 +66,7 @@
     </p>
     <ul>
       <li>超平坦 + 单层地面，<strong>旁观模式</strong>、和平难度、时间固定，不会有怪也不掉出去；</li>
-      <li>进去之后按 <kbd>F7</kbd> 开关编辑浮窗；</li>
+      <li>进去之后按「打开动画编辑器」按键开关编辑浮窗；</li>
       <li>它和你的正常存档互不影响，随时可以退出去。</li>
     </ul>
     <div class="callout note">
@@ -86,8 +86,10 @@
       </tbody>
     </table>
     <div class="callout tip">
-      <strong>世界里的坐标轴：</strong>选中物体后，它的位置处会出现一根三色坐标轴，<strong>拖轴</strong>就能沿该轴移动。
+      <strong>世界里的坐标轴：</strong>选中物体后，它的位置处会出现一根三色坐标轴 —— 它就是本库的<strong>移动轴</strong>，<strong>拖轴</strong>就能沿该轴移动。
+      位置仍由世界坐标投影决定，但线条画在<strong>2D 屏幕层</strong>、朝向固定（不随视角转动）。
       正对相机的那根轴会收缩隐藏（和 Blender / Unity 一样），避免出现没有意义的「斜线」。
+      它只在<strong>世界的浮窗预览</strong>里可用，也就是要先进入 <code class="inline">anima-config</code> 专用世界再按「打开动画编辑器」按键打开浮窗。
     </div>
 
     <h2 id="palette">效果/粒子 调色板<a class="anchor" href="#palette">#</a></h2>
@@ -117,7 +119,7 @@
         <tr><td>拖时间线空白处</td><td>拖动播放头（跳时间）</td></tr>
         <tr><td>滚轮</td><td>上下翻看轨道</td></tr>
         <tr><td><kbd>Ctrl</kbd> + 滚轮</td><td>缩放时间轴（以光标处为锚点）</td></tr>
-        <tr><td>右键动画条</td><td>菜单：复制 / 创建组 / 删除</td></tr>
+        <tr><td>右键动画条</td><td>菜单：复制 / 创建组 / 删除；贴近屏幕下边缘 / 右边缘时会自动向上 / 向左翻转，保证每一项都可见可点</td></tr>
         <tr><td><kbd>Delete</kbd></td><td>删除选中条目</td></tr>
         <tr><td>拖时间线右边缘</td><td>调整时间线窗口宽度</td></tr>
       </tbody>
@@ -210,7 +212,8 @@
     <table>
       <thead><tr><th>按键</th><th>作用</th></tr></thead>
       <tbody>
-        <tr><td><kbd>F7</kbd></td><td>打开 / 关闭编辑器浮窗</td></tr>
+        <tr><td>「打开动画编辑器」按键</td><td>打开 / 关闭编辑器浮窗（默认未指定，在「选项 → 按键控制 → 杂项」里绑定）</td></tr>
+        <tr><td>「播放 / 暂停（编辑器）」按键</td><td>播放 / 暂停（默认未指定；等同于空格）</td></tr>
         <tr><td><kbd>空格</kbd></td><td>播放 / 暂停（浮窗模式下留给「跳跃」，用底部播放按钮）</td></tr>
         <tr><td><kbd>Delete</kbd></td><td>删除选中的动画条 / 关键帧</td></tr>
         <tr><td><kbd>Ctrl</kbd> + 滚轮</td><td>按光标位置缩放时间轴</td></tr>
@@ -231,7 +234,7 @@
     <p>从旧名字（<code class="inline">texture-animation-library</code>）升级时会自动迁移这些目录，配置不会丢。</p>
 
     <footer class="foot">
-      <span>Anima｜赋灵 · Minecraft 1.21.1 · Fabric / NeoForge · Apache-2.0</span>
+      <span>Anima · Minecraft 1.21.1 · Fabric / NeoForge · Apache-2.0</span>
     </footer>
   </main>
 </div>
