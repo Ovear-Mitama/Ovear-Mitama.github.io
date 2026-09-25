@@ -11,6 +11,7 @@
   var DOCS = window.ANIMA_DOCS || { siteTitle: '文档', mods: [], nav: {} };
   var MODS = DOCS.mods || [];
   var NAV = DOCS.nav || {};
+  var VERSIONS = DOCS.versions || {};
   var I18N = window.SITE_I18N || { zh: {} };
   var LANGS = window.SITE_LANGS || [{ code: 'zh', label: '简体中文' }];
 
@@ -25,6 +26,10 @@
     return decodeURIComponent(location.pathname);
   }
 
+  function pathSegments() {
+    return pathName().split('/').filter(function (p) { return p !== ''; });
+  }
+
   function currentMod() {
     var path = pathName();
     for (var i = 0; i < MODS.length; i++) {
@@ -33,11 +38,58 @@
     return null;
   }
 
+  /* 页面 key = 相对站点根的路径(含版本目录),如 anima/26.1/api.html */
   function currentPageKey() {
-    var file = pathName().split('/').pop();
-    if (!file) file = 'index.html';
+    var segs = pathSegments();
     var mod = currentMod();
-    return mod ? (mod.id + '/' + file) : file;
+    if (!mod) return segs.length ? segs[segs.length - 1] : 'index.html';
+    var idx = segs.indexOf(mod.id);
+    var rest = segs.slice(idx + 1).join('/');
+    return mod.id + '/' + (rest || 'index.html');
+  }
+
+  /* 当前页面的文件名(不含目录) */
+  function currentFile() {
+    var segs = pathSegments();
+    var last = segs.length ? segs[segs.length - 1] : '';
+    return /\.[a-z0-9]+$/i.test(last) ? last : 'index.html';
+  }
+
+  /* ---------- MC 版本分档(没配 versions 的模组不分档) ---------- */
+  function versionsFor(mod) {
+    var list = mod ? VERSIONS[mod.id] : null;
+    return (list && list.length) ? list : null;
+  }
+
+  function defaultVersion(list) {
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].default) return list[i];
+    }
+    return list[0];
+  }
+
+  /* 地址里模组目录之后的第一段如果命中版本表,它就是当前版本 */
+  function currentVersion(mod) {
+    var list = versionsFor(mod);
+    if (!list) return null;
+    var segs = pathSegments();
+    var idx = segs.indexOf(mod.id);
+    var seg = idx >= 0 ? segs[idx + 1] : null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === seg) return list[i];
+    }
+    return null;
+  }
+
+  /* 页面里 %mc% / %jdk% 的替换值来自当前版本;不分档的模组原样保留 */
+  function fillVersion(text) {
+    var mod = currentMod();
+    var list = versionsFor(mod);
+    if (!list) return text;
+    var ver = currentVersion(mod) || defaultVersion(list);
+    return String(text)
+      .replace(/%mc%/g, ver.mc || ver.label)
+      .replace(/%jdk%/g, ver.jdk || '21');
   }
 
   /* mods 里的 home / icon 都是相对站点根写的(如 anima/index.html),而页面可能在下一层
@@ -89,11 +141,19 @@
 
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
+      closeOtherSelects(select);
       select.classList.toggle('open');
     });
     document.addEventListener('click', function () { select.classList.remove('open'); });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') select.classList.remove('open');
+    });
+  }
+
+  /* 顶栏的几个下拉(模组 / 版本)同时只开一个 */
+  function closeOtherSelects(keep) {
+    document.querySelectorAll('.doc-select.open').forEach(function (el) {
+      if (el !== keep) el.classList.remove('open');
     });
   }
 
@@ -105,6 +165,76 @@
     logo.alt = mod.label || '';
     /* 模组图标细节多,用平滑缩放而不是 style.css 里给站点图标定的像素化 */
     logo.classList.add('logo-mod');
+  }
+
+  /* ---------- 顶栏:MC 版本下拉(紧挨着模组下拉;只有配了 versions 的模组才有) ---------- */
+  function initVersionSelect() {
+    var mod = currentMod();
+    var list = versionsFor(mod);
+    if (!list) return;
+
+    var docSelect = document.getElementById('docSelect');
+    if (!docSelect || !docSelect.parentNode) return;
+
+    var here = currentVersion(mod) || defaultVersion(list);
+    var file = currentFile();
+
+    var box = document.createElement('div');
+    box.className = 'doc-select ver-select';
+    box.id = 'verSelect';
+
+    var btn = document.createElement('button');
+    btn.className = 'doc-current';
+    btn.type = 'button';
+    btn.id = 'verBtn';
+    btn.title = 'MC';
+
+    var icon = document.createElement('i');
+    icon.className = 'fa-solid fa-code-branch chev';
+    btn.appendChild(icon);
+
+    var label = document.createElement('span');
+    label.id = 'verLabel';
+    /* 这里放的是版本号本身,不能挂 data-i18n,否则会被词典文案覆盖 */
+    label.textContent = here.label;
+    btn.appendChild(label);
+
+    var caret = document.createElement('i');
+    caret.className = 'fa-solid fa-chevron-down chev';
+    btn.appendChild(caret);
+
+    var menu = document.createElement('div');
+    menu.className = 'doc-menu';
+    menu.id = 'verMenu';
+
+    list.forEach(function (v) {
+      var opt = document.createElement('a');
+      opt.className = 'doc-option' + (v.id === here.id ? ' active' : '');
+      /* 切版本时尽量停在同一个页面,没有那个文件就回该版本首页 */
+      opt.href = rootBase() + mod.id + '/' + v.id + '/' + file;
+      opt.textContent = v.label;
+      if (v.mc) {
+        var hint = document.createElement('span');
+        hint.className = 'doc-hint';
+        hint.textContent = 'Minecraft ' + v.mc;
+        opt.appendChild(hint);
+      }
+      menu.appendChild(opt);
+    });
+
+    box.appendChild(btn);
+    box.appendChild(menu);
+    docSelect.parentNode.insertBefore(box, docSelect.nextSibling);
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      closeOtherSelects(box);
+      box.classList.toggle('open');
+    });
+    document.addEventListener('click', function () { box.classList.remove('open'); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') box.classList.remove('open');
+    });
   }
 
   /* ---------- 侧栏:按 nav.js 里当前页的配置渲染 ---------- */
@@ -181,9 +311,9 @@
       var key = el.getAttribute('data-i18n');
       var orig = el.getAttribute('data-i18n-orig');
       if (dict[key] != null) {
-        el.innerHTML = dict[key];
+        el.innerHTML = fillVersion(dict[key]);
       } else if (orig != null) {
-        el.innerHTML = orig;
+        el.innerHTML = fillVersion(orig);
       }
     });
 
@@ -360,6 +490,7 @@
   /* ---------- 初始化 ---------- */
   initTheme();
   initTopbar();
+  initVersionSelect();
   renderNav();
   initMenuButton();
   initCopyButtons();
