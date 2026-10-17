@@ -27,13 +27,14 @@ window.SITE_I18N = {
     'nav.quickstart': '快速开始',
     'nav.register': '注册加分项',
     'nav.reference': 'API 参考',
-    'nav.example': '完整示例',
+    'nav.example': '完整示例',
+    'nav.stats': '会话数据 API',
     'nav.ingame': '在游戏内查看',
     'nav.notes': '注意事项',
 
     /* 首屏 */
     'hero.title': 'Damage Engine API',
-    'hero.lead': '为其他模组提供的扩展接口。当前包含<strong>评分 API（加分项）</strong>，后续将持续划分并扩展更多 API。',
+    'hero.lead': '为其他模组提供的扩展接口：<strong>评分 API（加分项）</strong>与<strong>会话数据 API</strong>。注册与读取都无需修改 Damage Engine 本身。',
 
     /* 简介 */
     'sec.overview': '简介',
@@ -44,14 +45,14 @@ window.SITE_I18N = {
 
     /* 前置条件 */
     'sec.requirements': '前置条件',
-    'requirements.text': '适用于 Damage Engine 1.4.7+（含）。',
+    'requirements.text': '适用于 Damage Engine 2.2.0+（含）。',
 
     /* 快速开始 */
     'sec.quickstart': '快速开始',
     'quick.li1': '在你的模组初始化阶段引入 <code class="inline">damage.engine.api.DamageEngineApi</code>。',
     'quick.li2': '调用 <code class="inline">DamageEngineApi.registerBonusProvider(...)</code> 注册加分项。',
     'quick.li3': '每次命中时，Damage Engine 会回调你的 <code class="inline">bonusOnHit(...)</code>，返回值即为该次命中增加的分数。',
-    'quick.li4': '打开配置界面 → <strong>评分</strong> → <strong>其他mod加分项</strong>，可看到已注册的加分项列表。',
+    'quick.li4': '打开配置界面 → <strong>评分</strong> → <strong>加分</strong> 页面，可看到已注册的加分项。',
     'quick.deps.title': '添加依赖',
     'quick.deps.p': '将 Damage Engine 作为编译期依赖（按你使用的发布渠道替换坐标）：',
     'quick.tip.label': '建议：',
@@ -70,14 +71,22 @@ window.SITE_I18N = {
     'ref.api.r1': '注册一个加分项。同一 <code class="inline">id()</code> 只注册一次，重复注册会被忽略并返回 <code class="inline">false</code>。',
     'ref.api.r2': '返回当前已注册的全部加分项（只读）。',
     'ref.bp.r1': '唯一标识，建议使用 <code class="inline">命名空间:路径</code> 形式；用于去重与界面展示。',
-    'ref.bp.r2': '在配置界面“其他mod加分项”中展示的名称。',
+    'ref.bp.r2': '在加分页面中展示的名称。',
     'ref.bp.r3': '每次命中时计算加分；返回 <code class="inline">0</code> 或负数表示不加分。',
     'ref.hit.r1': '本次命中造成的伤害',
     'ref.hit.r2': '本次命中是否被判定为暴击',
     'ref.ss.r1': '当前连击数',
     'ref.ss.r2': '命中次数（含暴击）',
     'ref.ss.r3': '暴击次数',
-    'ref.ss.r4': '本次评分会话的累计伤害',
+    'ref.ss.r4': '本次评分会话的累计伤害',
+    'sec.stats': '会话数据 API',
+    'stats.p': '通过 DamageEngineStats 读取当前评分会话数据；只读，无需注册。',
+    'stats.active': '当前是否有活跃的评分会话',
+    'stats.damage': '会话累计伤害',
+    'stats.combo': '当前连击数',
+    'stats.streak': '当前连杀数',
+    'stats.score': '当前评分会话累计分数',
+    'stats.grade': '当前评价等级文本（S/A/B…）',
 
     /* 完整示例 */
     'sec.example': '完整示例',
@@ -85,9 +94,9 @@ window.SITE_I18N = {
 
     /* 游戏内查看 */
     'sec.ingame': '在游戏内查看',
-    'ingame.p': '打开配置界面（默认按键可在“按键”标签页查看），进入 <strong>评分</strong> 标签页，展开“单次伤害大小加分”下方的 <strong>其他mod加分项</strong>：',
-    'ingame.li1': '已注册的加分项会以 <code class="inline">显示名 (id)</code> 的形式列出；',
-    'ingame.li2': '若没有任何模组注册加分项，该分组内会显示一行占位提示。',
+    'ingame.p': '打开配置界面（默认按键可在“按键”标签页查看），进入 <strong>评分</strong> 标签页，点击 <strong>加分</strong> 右侧的 <code class="inline">&gt;</code> 进入独立加分页面：',
+    'ingame.li1': '已注册的加分项会参与每次命中的评分计算，并出现在分数 HUD 的加分提示中；',
+    'ingame.li2': '加分页面可以编辑内置与自定义加分项的名称、表达式和开关。',
 
     /* 注意事项 */
     'sec.notes': '注意事项',
@@ -109,7 +118,7 @@ window.SITE_I18N = {
     /* 控件 */
     'btn.copy': '复制',
     'btn.copied': '已复制',
-    'footer.text': 'Damage Engine API · 适用于 Damage Engine 1.4.7+（含）'
+    'footer.text': 'Damage Engine API · 适用于 Damage Engine 2.2.0+（含）',
   },
 
   en: {
@@ -126,12 +135,13 @@ window.SITE_I18N = {
     'nav.quickstart': 'Quick Start',
     'nav.register': 'Register a Bonus',
     'nav.reference': 'API Reference',
-    'nav.example': 'Full Example',
+    'nav.example': 'Full Example',
+    'nav.stats': 'Stats API',
     'nav.ingame': 'In-Game Preview',
     'nav.notes': 'Notes',
 
     'hero.title': 'Damage Engine API',
-    'hero.lead': 'Extension APIs for other mods. Currently includes the <strong>Rating API (bonus providers)</strong>; more APIs will be added over time.',
+    'hero.lead': 'Extension APIs for other mods: the <strong>Rating API (bonus providers)</strong> and the <strong>session stats API</strong>. No changes to Damage Engine itself are required.',
 
     'sec.overview': 'Overview',
     'overview.p1': 'Register a <code class="inline">BonusProvider</code> to let your own rules take part in Damage Engine\u2019s Rating calculation \u2014 <strong>the bonus conditions are defined by your mod</strong>.',
@@ -140,13 +150,13 @@ window.SITE_I18N = {
     'overview.note.body': 'The API lives in the <code class="inline">damage.engine.api</code> package and is shared by Fabric and NeoForge \u2014 registration is identical on both.',
 
     'sec.requirements': 'Requirements',
-    'requirements.text': 'Works with Damage Engine 1.4.7+ (inclusive).',
+    'requirements.text': 'Works with Damage Engine 2.2.0+ (inclusive).',
 
     'sec.quickstart': 'Quick Start',
     'quick.li1': 'Reference <code class="inline">damage.engine.api.DamageEngineApi</code> during your mod initialization.',
     'quick.li2': 'Call <code class="inline">DamageEngineApi.registerBonusProvider(...)</code> to register a bonus provider.',
     'quick.li3': 'On every hit, Damage Engine calls your <code class="inline">bonusOnHit(...)</code>; the returned value is the score added for that hit.',
-    'quick.li4': 'Open the config screen \u2192 <strong>Rating</strong> \u2192 <strong>Other Mod Bonuses</strong> to see all registered providers.',
+    'quick.li4': 'Open the config screen → <strong>Rating</strong> → the <strong>Bonus</strong> page to see registered providers.',
     'quick.deps.title': 'Adding the dependency',
     'quick.deps.p': 'Add Damage Engine as a compile-time dependency (replace the coordinates with your distribution channel):',
     'quick.tip.label': 'Tip:',
@@ -163,22 +173,30 @@ window.SITE_I18N = {
     'ref.api.r1': 'Registers a bonus provider. The same <code class="inline">id()</code> is only registered once; duplicates are ignored and return <code class="inline">false</code>.',
     'ref.api.r2': 'Returns all currently registered providers (read-only).',
     'ref.bp.r1': 'Unique identifier; <code class="inline">namespace:path</code> is recommended. Used for de-duplication and display.',
-    'ref.bp.r2': 'Name shown in the \u201cOther Mod Bonuses\u201d section of the config screen.',
+    'ref.bp.r2': 'Name shown on the Bonus page.',
     'ref.bp.r3': 'Computes the bonus for one hit; return <code class="inline">0</code> or a negative value to add nothing.',
     'ref.hit.r1': 'Damage dealt by this hit',
     'ref.hit.r2': 'Whether this hit was treated as a critical hit',
     'ref.ss.r1': 'Current combo count',
     'ref.ss.r2': 'Number of hits (including crits)',
     'ref.ss.r3': 'Number of critical hits',
-    'ref.ss.r4': 'Total damage of the current rating session',
+    'ref.ss.r4': 'Total damage of the current rating session',
+    'sec.stats': 'Session Stats API',
+    'stats.p': 'Read read-only session data through DamageEngineStats; no registration required.',
+    'stats.active': 'Whether a rating session is active',
+    'stats.damage': 'Session total damage',
+    'stats.combo': 'Current combo count',
+    'stats.streak': 'Current killstreak',
+    'stats.score': 'Current session score',
+    'stats.grade': 'Current grade text (S/A/B...)',
 
     'sec.example': 'Full Example',
     'example.p': 'Fully custom conditions: extra points for crits at combo \u2265 5, plus a reward for high single-hit damage.',
 
     'sec.ingame': 'In-Game Preview',
-    'ingame.p': 'Open the config screen (see the Keybinds tab for the default key), go to the <strong>Rating</strong> tab and expand <strong>Other Mod Bonuses</strong> below \u201cSingle-Hit Damage Bonus\u201d:',
-    'ingame.li1': 'Registered providers are listed as <code class="inline">displayName (id)</code>;',
-    'ingame.li2': 'if no mod registered any provider, a placeholder line is shown instead.',
+    'ingame.p': 'Open the config screen (see the Keybinds tab for the default key), go to the <strong>Rating</strong> tab and click <code class="inline">&gt;</code> next to <strong>Bonus</strong>:',
+    'ingame.li1': 'Registered providers take part in scoring and appear in the score HUD gain feed;',
+    'ingame.li2': 'the Bonus page edits names, expressions and toggles for built-in and custom bonuses.',
 
     'sec.notes': 'Notes',
     'notes.li1': '<strong>Idempotent:</strong> providers with the same <code class="inline">id()</code> are registered only once, so calling it unconditionally during init is fine.',
@@ -197,7 +215,7 @@ window.SITE_I18N = {
 
     'btn.copy': 'Copy',
     'btn.copied': 'Copied',
-    'footer.text': 'Damage Engine API \u00b7 Works with Damage Engine 1.4.7+ (inclusive)',
+    'footer.text': 'Damage Engine API · Works with Damage Engine 2.2.0+ (inclusive)',
 
     /* ---------- Anima:侧栏 ---------- */
     'nv.group.docs': 'Docs',
@@ -286,13 +304,14 @@ window.SITE_I18N = {
     'nav.quickstart': '快速開始',
     'nav.register': '註冊加分項',
     'nav.reference': 'API 參考',
-    'nav.example': '完整範例',
+    'nav.example': '完整範例',
+    'nav.stats': '會話資料 API',
     'nav.ingame': '在遊戲內查看',
     'nav.notes': '注意事項',
 
     /* 首屏 */
     'hero.title': 'Damage Engine API',
-    'hero.lead': '為其他模組提供的擴充介面。目前包含<strong>評分 API（加分項）</strong>，後續將持續劃分並擴充更多 API。',
+    'hero.lead': '為其他模組提供的擴充介面：<strong>評分 API（加分項）</strong>與<strong>會話資料 API</strong>。註冊與讀取都無需修改 Damage Engine 本身。',
 
     /* 簡介 */
     'sec.overview': '簡介',
@@ -303,14 +322,14 @@ window.SITE_I18N = {
 
     /* 前置條件 */
     'sec.requirements': '前置條件',
-    'requirements.text': '適用於 Damage Engine 1.4.7+（含）。',
+    'requirements.text': '適用於 Damage Engine 2.2.0+（含）。',
 
     /* 快速開始 */
     'sec.quickstart': '快速開始',
     'quick.li1': '在你的模組初始化階段引入 <code class="inline">damage.engine.api.DamageEngineApi</code>。',
     'quick.li2': '呼叫 <code class="inline">DamageEngineApi.registerBonusProvider(...)</code> 註冊加分項。',
     'quick.li3': '每次命中時，Damage Engine 會回呼你的 <code class="inline">bonusOnHit(...)</code>，回傳值即為該次命中增加的分數。',
-    'quick.li4': '開啟設定介面 → <strong>評分</strong> → <strong>其他mod加分項</strong>，可看到已註冊的加分項清單。',
+    'quick.li4': '開啟設定介面 → <strong>評分</strong> → <strong>加分</strong> 頁面，可看到已註冊的加分項。',
     'quick.deps.title': '加入依賴',
     'quick.deps.p': '將 Damage Engine 作為編譯期依賴（依你使用的發布管道替換座標）：',
     'quick.tip.label': '建議：',
@@ -329,14 +348,22 @@ window.SITE_I18N = {
     'ref.api.r1': '註冊一個加分項。同一 <code class="inline">id()</code> 只註冊一次，重複註冊會被忽略並回傳 <code class="inline">false</code>。',
     'ref.api.r2': '回傳目前所有已註冊的加分項（唯讀）。',
     'ref.bp.r1': '唯一識別碼，建議使用 <code class="inline">命名空間:路徑</code> 形式；用於去重與介面顯示。',
-    'ref.bp.r2': '在設定介面「其他mod加分項」中顯示的名稱。',
+    'ref.bp.r2': '在加分頁面中顯示的名稱。',
     'ref.bp.r3': '每次命中時計算加分；回傳 <code class="inline">0</code> 或負數表示不加分。',
     'ref.hit.r1': '本次命中造成的傷害',
     'ref.hit.r2': '本次命中是否判定為暴擊',
     'ref.ss.r1': '目前連擊數',
     'ref.ss.r2': '命中次數（含暴擊）',
     'ref.ss.r3': '暴擊次數',
-    'ref.ss.r4': '本次評分階段的累計傷害',
+    'ref.ss.r4': '本次評分階段的累計傷害',
+    'sec.stats': '會話資料 API',
+    'stats.p': '透過 DamageEngineStats 讀取目前評分會話資料；唯讀，無需註冊。',
+    'stats.active': '目前是否有活躍的評分會話',
+    'stats.damage': '會話累計傷害',
+    'stats.combo': '目前連擊數',
+    'stats.streak': '目前連殺數',
+    'stats.score': '目前評分會話累計分數',
+    'stats.grade': '目前評價等級文字（S/A/B…）',
 
     /* 完整範例 */
     'sec.example': '完整範例',
@@ -344,9 +371,9 @@ window.SITE_I18N = {
 
     /* 遊戲內查看 */
     'sec.ingame': '在遊戲內查看',
-    'ingame.p': '開啟設定介面（預設按鍵可在「按鍵」頁籤查看），進入 <strong>評分</strong> 頁籤，展開「單次傷害大小加分」下方的 <strong>其他mod加分項</strong>：',
-    'ingame.li1': '已註冊的加分項會以 <code class="inline">顯示名 (id)</code> 的形式列出；',
-    'ingame.li2': '若沒有任何模組註冊加分項，該分組內會顯示一行佔位提示。',
+    'ingame.p': '開啟設定介面（預設按鍵可在「按鍵」頁籤查看），進入 <strong>評分</strong> 頁籤，點擊 <strong>加分</strong> 右側的 <code class="inline">&gt;</code> 進入獨立加分頁面：',
+    'ingame.li1': '已註冊的加分項會參與每次命中的評分計算，並出現在分數 HUD 的加分提示中；',
+    'ingame.li2': '加分頁面可以編輯內建與自訂加分項的名稱、表達式和開關。',
 
     /* 注意事項 */
     'sec.notes': '注意事項',
@@ -368,7 +395,7 @@ window.SITE_I18N = {
     /* 控制項 */
     'btn.copy': '複製',
     'btn.copied': '已複製',
-    'footer.text': 'Damage Engine API · 適用於 Damage Engine 1.4.7+（含）',
+    'footer.text': 'Damage Engine API · 適用於 Damage Engine 2.2.0+（含）',
 
     /* ---------- Anima:側欄 ---------- */
     'nv.group.docs': '文檔',

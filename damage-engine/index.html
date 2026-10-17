@@ -43,7 +43,8 @@
     <section class="hero">
       <h1 data-i18n="hero.title">Damage Engine API</h1>
       <p class="lead" data-i18n="hero.lead">
-        为其他模组提供的扩展接口。当前包含<strong>评分 API（加分项）</strong>，后续将持续划分并扩展更多 API。
+        为其他模组提供的扩展接口：<strong>评分 API（加分项）</strong>与<strong>会话数据 API</strong>。
+        注册与读取都无需修改 Damage Engine 本身。
       </p>
     </section>
 
@@ -61,14 +62,14 @@
     </div>
 
     <h2 id="requirements"><span data-i18n="sec.requirements">前置条件</span><a class="anchor" href="#requirements">#</a></h2>
-    <p data-i18n="requirements.text">适用于 Damage Engine 1.4.7+（含）。</p>
+    <p data-i18n="requirements.text">适用于 Damage Engine 2.2.0+（含）。</p>
 
     <h2 id="quickstart"><span data-i18n="sec.quickstart">快速开始</span><a class="anchor" href="#quickstart">#</a></h2>
     <ol>
       <li data-i18n="quick.li1">在你的模组初始化阶段引入 <code class="inline">damage.engine.api.DamageEngineApi</code>。</li>
       <li data-i18n="quick.li2">调用 <code class="inline">DamageEngineApi.registerBonusProvider(...)</code> 注册加分项。</li>
       <li data-i18n="quick.li3">每次命中时，Damage Engine 会回调你的 <code class="inline">bonusOnHit(...)</code>，返回值即为该次命中增加的分数。</li>
-      <li data-i18n="quick.li4">打开配置界面 → <strong>评分</strong> → <strong>其他mod加分项</strong>，可看到已注册的加分项列表。</li>
+      <li data-i18n="quick.li4">打开配置界面 → <strong>评分</strong> → <strong>加分</strong> 页面，可看到已注册的加分项。</li>
     </ol>
 
     <h3 data-i18n="quick.deps.title">添加依赖</h3>
@@ -76,9 +77,9 @@
     <div class="code-head"><span>build.gradle</span><button class="copy-btn" data-i18n="btn.copy">复制</button></div>
     <pre><code>dependencies {
     <span data-i18n="code.gradle.c1">// 若通过 Maven 发布，替换为实际坐标</span>
-    modImplementation "damage.engine:damage-engine:1.4.7"
+    modImplementation "damage.engine:damage-engine:2.2.0"
     <span data-i18n="code.gradle.c2">// 或者直接引用本地 jar</span>
-    // modCompileOnly files("libs/damage-engine-1.4.7.jar")
+    // modCompileOnly files("libs/damage-engine-2.2.0.jar")
 }</code></pre>
     <div class="callout tip">
       <strong data-i18n="quick.tip.label">建议：</strong>
@@ -88,11 +89,14 @@
     <h2 id="register"><span data-i18n="sec.register">注册加分项</span><a class="anchor" href="#register">#</a></h2>
     <p data-i18n="register.p">最小示例：单次伤害 ≥ 100 时额外 +50 分。</p>
     <div class="code-head"><span>ExampleMod.java</span><button class="copy-btn" data-i18n="btn.copy">复制</button></div>
-    <pre><code>import damage.engine.api.DamageEngineApi;
+    <pre><code>import damage.engine.api.BonusProvider;
+import damage.engine.api.DamageEngineApi;
+import damage.engine.api.Hit;
+import damage.engine.api.SessionStats;
 
 public final class ExampleMod {
     public static void init() {
-        DamageEngineApi.registerBonusProvider(new DamageEngineApi.BonusProvider() {
+        DamageEngineApi.registerBonusProvider(new BonusProvider() {
             @Override
             public String id() {
                 return "example_mod:heavy_hit";
@@ -104,7 +108,7 @@ public final class ExampleMod {
             }
 
             @Override
-            public float bonusOnHit(DamageEngineApi.Hit hit, DamageEngineApi.SessionStats session) {
+            public float bonusOnHit(Hit hit, SessionStats session) {
                 return hit.damage() >= 100f ? 50f : 0f;
             }
         });
@@ -128,7 +132,7 @@ public final class ExampleMod {
       </tbody>
     </table>
 
-    <h3>DamageEngineApi.BonusProvider</h3>
+    <h3>BonusProvider</h3>
     <table>
       <thead><tr><th data-i18n="ref.th.method">方法</th><th data-i18n="ref.th.desc">说明</th></tr></thead>
       <tbody>
@@ -138,7 +142,7 @@ public final class ExampleMod {
       </tbody>
     </table>
 
-    <h3>DamageEngineApi.Hit</h3>
+    <h3>Hit</h3>
     <table>
       <thead><tr><th data-i18n="ref.th.member">成员</th><th data-i18n="ref.th.type">类型</th><th data-i18n="ref.th.desc">说明</th></tr></thead>
       <tbody>
@@ -147,7 +151,7 @@ public final class ExampleMod {
       </tbody>
     </table>
 
-    <h3>DamageEngineApi.SessionStats</h3>
+    <h3>SessionStats</h3>
     <table>
       <thead><tr><th data-i18n="ref.th.member">成员</th><th data-i18n="ref.th.type">类型</th><th data-i18n="ref.th.desc">说明</th></tr></thead>
       <tbody>
@@ -158,15 +162,42 @@ public final class ExampleMod {
       </tbody>
     </table>
 
+    <h2 id="stats"><span data-i18n="sec.stats">会话数据 API</span><a class="anchor" href="#stats">#</a></h2>
+    <p data-i18n="stats.p">
+      通过 <code class="inline">DamageEngineStats</code> 读取当前评分会话数据；只读，无需注册，也不会修改 Damage Engine。
+    </p>
+    <table>
+      <thead><tr><th data-i18n="ref.th.method">方法</th><th data-i18n="ref.th.type">类型</th><th data-i18n="ref.th.desc">说明</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">isActive()</code></td><td><code class="inline">boolean</code></td><td data-i18n="stats.active">当前是否有活跃的评分会话</td></tr>
+        <tr><td><code class="inline">getTotalDamage()</code></td><td><code class="inline">float</code></td><td data-i18n="stats.damage">会话累计伤害</td></tr>
+        <tr><td><code class="inline">getComboCount()</code></td><td><code class="inline">int</code></td><td data-i18n="stats.combo">当前连击数</td></tr>
+        <tr><td><code class="inline">getKillStreak()</code></td><td><code class="inline">int</code></td><td data-i18n="stats.streak">当前连杀数</td></tr>
+        <tr><td><code class="inline">getScore()</code></td><td><code class="inline">float</code></td><td data-i18n="stats.score">当前评分会话累计分数</td></tr>
+        <tr><td><code class="inline">getGrade()</code></td><td><code class="inline">String</code></td><td data-i18n="stats.grade">当前评价等级文本（S/A/B…）</td></tr>
+      </tbody>
+    </table>
+    <div class="code-head"><span>ReadStats.java</span><button class="copy-btn" data-i18n="btn.copy">复制</button></div>
+    <pre><code>import damage.engine.api.DamageEngineStats;
+
+float damage = DamageEngineStats.getTotalDamage();
+int combo = DamageEngineStats.getComboCount();
+int streak = DamageEngineStats.getKillStreak();
+float score = DamageEngineStats.getScore();
+String grade = DamageEngineStats.getGrade();</code></pre>
+
     <h2 id="example"><span data-i18n="sec.example">完整示例</span><a class="anchor" href="#example">#</a></h2>
     <p data-i18n="example.p">条件完全自定义：连击 ≥ 5 的暴击额外加分，且对单次高额伤害追加奖励。</p>
     <div class="code-head"><span>MyBonus.java</span><button class="copy-btn" data-i18n="btn.copy">复制</button></div>
-    <pre><code>import damage.engine.api.DamageEngineApi;
+    <pre><code>import damage.engine.api.BonusProvider;
+import damage.engine.api.DamageEngineApi;
+import damage.engine.api.Hit;
+import damage.engine.api.SessionStats;
 
 public final class MyBonus {
 
     public static void register() {
-        DamageEngineApi.registerBonusProvider(new DamageEngineApi.BonusProvider() {
+        DamageEngineApi.registerBonusProvider(new BonusProvider() {
 
             @Override
             public String id() {
@@ -179,7 +210,7 @@ public final class MyBonus {
             }
 
             @Override
-            public float bonusOnHit(DamageEngineApi.Hit hit, DamageEngineApi.SessionStats session) {
+            public float bonusOnHit(Hit hit, SessionStats session) {
                 float bonus = 0f;
 
                 <span data-i18n="code.bonus.c1">// 条件 1：连击 ≥ 5 且本次为暴击</span>
@@ -205,12 +236,11 @@ public final class MyBonus {
 
     <h2 id="ingame"><span data-i18n="sec.ingame">在游戏内查看</span><a class="anchor" href="#ingame">#</a></h2>
     <p data-i18n="ingame.p">
-      打开配置界面（默认按键可在“按键”标签页查看），进入 <strong>评分</strong> 标签页，
-      展开“单次伤害大小加分”下方的 <strong>其他mod加分项</strong>：
+      打开配置界面（默认按键可在“按键”标签页查看），进入 <strong>评分</strong> 标签页，点击 <strong>加分</strong> 右侧的 <code class="inline">&gt;</code> 进入独立加分页面：
     </p>
     <ul>
-      <li data-i18n="ingame.li1">已注册的加分项会以 <code class="inline">显示名 (id)</code> 的形式列出；</li>
-      <li data-i18n="ingame.li2">若没有任何模组注册加分项，该分组内会显示一行占位提示。</li>
+      <li data-i18n="ingame.li1">已注册的加分项会参与每次命中的评分计算，并出现在分数 HUD 的加分提示中；</li>
+      <li data-i18n="ingame.li2">加分页面可以编辑内置与自定义加分项的名称、表达式和开关。</li>
     </ul>
 
     <h2 id="notes"><span data-i18n="sec.notes">注意事项</span><a class="anchor" href="#notes">#</a></h2>
@@ -223,7 +253,7 @@ public final class MyBonus {
     </ul>
 
     <footer class="foot">
-      <span data-i18n="footer.text">Damage Engine API · 适用于 Damage Engine 1.4.7+（含）</span>
+      <span data-i18n="footer.text">Damage Engine API · 适用于 Damage Engine 2.2.0+（含）</span>
     </footer>
   </main>
 </div>
