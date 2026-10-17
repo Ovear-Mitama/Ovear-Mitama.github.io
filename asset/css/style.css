@@ -182,7 +182,7 @@ header.topbar {
   opacity: .7;
   transition: transform .15s ease;
 }
-.doc-select.open .doc-current .chev { transform: rotate(180deg); }
+.doc-select.open .doc-current .chev:last-child { transform: rotate(180deg); }
 
 .doc-menu {
   position: absolute;
